@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        /* CSS se mantiene igual para conservar el diseño */
+        body {
+            background-color: #1b120d;
+            color: #fff;
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header {
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
+        .contenedor {
+            width: 90%;
+            max-width: 500px;
+            margin: 30px auto;
+            background-color: #241913;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .contenedor h2 {
+            color: #ffce73;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ddd;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        /* Omitimos estilos de campos de tarjeta/NIP para priorizar la seguridad */
+
+        .continue-button {
+            display: block;
+            width: 100%;
+            background-color: #7fa650;
+            color: #fff;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .continue-button:hover {
+            background-color: #94c163;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #ddd;
+        }
+        .link a {
+            color: #ffce73;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header onclick="window.location.href='{% url "inicio" %}';">
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo" style="height: 30px; margin-right: 10px;">
+        OLIVOS VERDES
+    </header>
+
+    <main>
+        <div class="contenedor">
+            <h2>Regístrate</h2>
+
+                        {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="error-text">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" class="register-form">
+                        {% csrf_token %}
+
+                        {% if next %}
+                            <input type="hidden" name="next" value="{{ next }}">
+                        {% endif %}
+
+                        <!-- Nombre de usuario -->
+                        <div class="form-group">
+                            <label class="form-label">Nombre de Usuario:</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="error-text">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="form-group">
+                            <label class="form-label">Correo Electrónico:</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="error-text">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Nombre -->
+                        <div class="form-group">
+                            <label class="form-label">Nombre:</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="error-text">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Apellido -->
+                        <div class="form-group">
+                            <label class="form-label">Apellido:</label>
+                            {{ form.last_name}}
+                            {% if form.last_name.errors %}
+                                <div class="error-text">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="form-group">
+                            <label class="form-label">Dirección de Entrega:</label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                                <div class="error-text">{{ form.direccion.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="form-group">
+                            <label class="form-label">Teléfono:</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                                <div class="error-text">{{ form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="form-group">
+                            <label class="form-label">Contraseña:</label>
+                            {{ form.password1 }}
+                            <div class="help-text">{{ form.password1.help_text }}</div>
+                            {% if form.password1.errors %}
+                                <div class="error-text">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confirmar contraseña -->
+                        <div class="form-group">
+                            <label class="form-label">Confirmar Contraseña:</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="error-text">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="continue-button ">Registrarse</button>
+                    </form>
+
+
+            
+            <p class="link">
+                ¿Ya tienes una cuenta?
+                <a href="{% url 'iniciar_sesion' %}">Inicia sesión aquí</a>
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        Emma Monserrat Ortiz Martinez 0306 | Construye Aplicaciones Web
+    </footer>
+</body>
+</html>

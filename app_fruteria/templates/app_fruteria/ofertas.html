@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertas | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        body {
+            background-color: #1b120d;
+            color: #fff;
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        h1 {
+            margin: 40px 30px 10px;
+            font-size: 28px;
+            
+        }
+
+        p.intro {
+            margin: 0 30px 50px;
+            color: #ddd;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .oferta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #1b120d;
+            border-radius: 20px;
+            margin: 30px auto;
+            width: 80%;
+            max-width: 700px;
+            padding: 20px;
+            gap: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            /* Borde rojo para destacar la oferta */
+            border: 2px solid #ff4d4d;
+        }
+
+        .oferta img {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 4px solid #ff4d4d;
+        }
+
+        .texto {
+            flex: 1;
+            text-align: left;
+        }
+
+        .texto h2 {
+            margin: 0 0 10px 0;
+            color: #ffce73;
+        }
+
+        .texto p {
+            margin-bottom: 15px;
+            color: #e6e6e6;
+        }
+        
+        .texto p strong {
+            color: #ff4d4d; /* Rojo para el precio/descuento */
+            font-weight: bold;
+        }
+
+        .texto button {
+            background-color: #7fa650;
+            border: none;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .texto button:hover {
+            background-color: #94c163;
+        }
+
+        footer {
+            background-color: #1b120d;
+            color: #aaa;
+            padding: 15px;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        /* === Barra Hamburguesa === */
+        .hamburger-icon {
+            display: block;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #66842f;
+        }
+
+        .menu-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #66842f;
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .menu-nav.active {
+            transform: translateX(0);
+        }
+
+        .menu-nav ul {
+            list-style: none;
+            padding: 70px 0 0 0;
+            margin: 0;
+        }
+
+        .menu-nav li a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid #555;
+        }
+
+        .menu-nav li a:hover {
+            background-color: #555;
+        }
+
+         /* --- Nuevos Estilos para Submenús --- */
+            .menu-nav li.has-submenu {
+                position: relative;
+            }
+
+            /* Submenú oculto por defecto */
+            .menu-nav .submenu {
+                display: none;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                background-color: #271b04ff;
+                border-top: 1px solid #271b04ff;
+            }
+
+            /* Mostrar submenú solo cuando tiene la clase .show */
+            .menu-nav .submenu.show {
+                display: block;
+            }
+
+            /* Ítems del submenú */
+            .menu-nav .submenu li a {
+                padding: 10px 20px 10px 30px;
+                font-size: 14px;
+                background-color: #271b04ff;
+            }
+
+            .menu-nav .submenu li a:hover {
+                text-decoration: underline;
+            }
+
+            /* Estilo para el botón Categorías */
+            .menu-nav li.has-submenu > a {
+                font-weight: bold;
+            }
+
+            .menu-nav li.has-submenu > a:hover {
+                background-color: #3a2706;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo">
+        Olivos Verdes
+    </header>
+
+    <button class="hamburger-icon" id="menu-btn">☰</button>
+    
+     <nav class="menu-nav" id="menu">
+        <ul>
+            <li><a href="{% url 'ver_ofertas' %}">Ofertas</a></li>
+            <li class="has-submenu">
+                <a href="#">Categorías ▾</a>
+                <ul class="submenu">
+                    <li><a href="{% url 'menu_virtual' %}">Todo el Menú</a></li>
+                    <li><a href="{% url 'frutas_citricas' %}">Cítricas</a></li>
+                    <li><a href="{% url 'frutas_dulces' %}">Dulces</a></li>
+                    <li><a href="{% url 'frutas_neutras' %}">Neutras</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'ver_carrito' %}">Carrito</a></li>
+            
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'confirmar_compra' %}">Comprar</a></li>
+                <li><a href="{% url 'perfil' %}" style="background-color: #4a6121; font-weight: bold;">Perfil ({{ user.username }})</a></li>
+                <li><a href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
+
+            {% else %}
+                <li><a href="{% url 'iniciar_sesion' %}">Iniciar Sesión</a></li>
+                <li><a href="{% url 'registro' %}">Registrarse</a></li>
+            {% endif %}
+            </ul>
+    </nav>
+
+    <h1 style="color:#66842f; text-align:center;">Elige alguna de nuestras increíbles ofertas</h1>
+    <p class="intro" style="text-align:center;">
+        Aprovecha estas ofertas por tiempo limitado.
+    </p>
+{% for producto in lista_productos %} 
+<section class="oferta" data-producto-id="{{ producto.id }}">
+    
+    {% if producto.imagen %}
+        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+    {% else %}
+        <img src="{% static 'app_fruteria/imagenes/placeholder.jpg' %}" alt="{{ producto.nombre }}">
+    {% endif %}
+    
+    <div class="texto">
+        <h2>¡{{ producto.oferta.nombre }}!</h2> 
+        <p>
+            {{ producto.oferta.descripcion }} 
+            
+            <br>Precio Original: <del>${{ producto.precio|floatformat:2 }}</del>
+            <br>Válido hasta: {{ producto.oferta.fecha_fin|date:"d M Y" }}
+        </p>
+        
+        <button class="btn-accion js-add-to-cart" 
+                data-product-id="{{ producto.id }}" 
+                data-product-name="{{ producto.nombre }}"
+                style="display: inline-block;">
+            Seleccionar oferta
+        </button>
+    </div>
+</section>
+{% empty %}
+<p style="text-align: center; margin-top: 50px;">Lo sentimos, no hay ofertas vigentes en este momento.</p>
+{% endfor %}
+    <footer>
+        Emma Monserrat Ortiz Martinez 0306 | Construye Aplicaciones Web
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
+        menuBtn.addEventListener('click', () => menu.classList.toggle('active'));
+ 
+        // -------------------------------------------------------------
+        // JS para Submenú Clic (MUESTRA SOLO AL DAR CLIC)
+        // -------------------------------------------------------------
+        
+       const submenuToggle = document.querySelector('.has-submenu > a');
+       const submenu = document.querySelector('.has-submenu .submenu');
+
+        submenuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            submenu.classList.toggle('show');
+     });
+
+        function showToastMessage(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+    
+            // Estilos básicos para la notificación
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background-color: #7fa650; /* Color de éxito */
+                color: white;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.2s, transform 0.2s;
+                transform: translateY(-50px);
+            `;
+    
+            document.body.appendChild(toast);
+            
+            // Mostrar y luego ocultar
+            setTimeout(() => {
+                toast.style.opacity = 1;
+                toast.style.transform = 'translateY(0)';
+            }, 10);
+
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                toast.style.transform = 'translateY(-50px)';
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 1500); // Mostrar por 3 segundos
+        }
+
+        document.querySelectorAll('.js-add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.dataset.productId;
+                const url = `/agregar-carrito/${productId}/`; // Asegúrate de que esta URL coincida con tu urls.py
+                
+                // Usar Fetch API para enviar la solicitud de forma asíncrona
+                fetch(url, {
+                    method: 'GET', // Usamos GET ya que el botón no es un formulario, aunque POST sería más RESTful
+                    headers: {
+                        // Indicamos al servidor que es una solicitud AJAX
+                        'X-Requested-With': 'XMLHttpRequest', 
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Muestra la notificación suave
+                        showToastMessage(data.message);
+                        
+                        // Opcional: Actualizar un contador de carrito en el header sin recargar
+                        // document.getElementById('cart-count').textContent = data.cart_count;
+                    } else {
+                        showToastMessage('Error al añadir el producto.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToastMessage('Error de conexión con el servidor.', 'error');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frutería Olivos Verdes</title>
+    {% load static %}
+    <style>
+        /* === Estilos Generales === */
+        body {
+            background-color: #1b120d; 
+            color: #fff; 
+            font-family: 'Verdana', sans-serif; 
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+          
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+            flex-direction: row;
+            cursor: pointer;
+        }
+        
+        header .header-content {
+            padding-left: 10px;
+        }
+
+        header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            color: #66842f;
+            margin: 0;
+        }
+
+        header p {
+            color: #ddd;
+            font-size: 14px;
+            margin: 5px 0 0 0;
+        }
+
+        /* --- Contenido principal --- */
+        main {
+            flex: 1;
+            padding: 20px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contenedor {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            max-width: 1000px;
+            margin: 40px auto;
+            background-color: #241913;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .texto { flex: 1; min-width: 280px; padding: 20px; text-align: left; }
+        .texto h2 { font-size: 28px; margin-bottom: 15px; color: #ffce73; }
+        .texto p { max-width: 450px; line-height: 1.6; margin-bottom: 25px; color: #ddd; }
+        .btn-accion {
+            display: inline-block; background-color: #7fa650; color: #fff; padding: 12px 25px;
+            text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 16px; 
+            border: none; cursor: pointer; transition: background-color 0.2s ease-in-out;
+        }
+        .btn-accion:hover { background-color: #94c163; }
+
+        .imagen { flex: 1; text-align: center; min-width: 280px; }
+        .imagen img { max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+
+        footer {
+            background-color: #1b120d;
+            color: #aaa;
+            padding: 15px;
+            font-size: 13px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .contenedor { flex-direction: column; text-align: center; }
+            .texto { text-align: center; padding-bottom: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo">
+        <div class="header-content">
+            <h1>OLIVOS VERDES</h1>
+            <p>Entra y descubre un mundo de color y aromas solo en la mejor frutería de Juárez</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="contenedor">
+            <div class="texto">
+                <h2>¡Frutas deliciosas y frescas para ti!</h2>
+                <p>Disfruta nuestra gran variedad de productos de temporada, siempre frescos y llenos de sabor. En Olivos Verdes, la calidad y el buen gusto se encuentran en cada rincón.</p>
+                <a href="{% url 'menu_virtual' %}" class="btn-accion">Más</a> 
+            </div>
+
+            <div class="imagen">
+                <img src="{% static 'app_fruteria/imagenes/portada.jpeg' %}" alt="Frutas variadas">
+            </div>
+        </div>
+
+     
+
+    </main>
+
+    <footer>
+        Emma Monserrat Ortiz Martinez 0306 | Construye Aplicaciones Web
+    </footer>
+
+    <script>
+        const header = document.querySelector('header');
+        header.addEventListener('click', () => {
+             window.location.href = '{% url "inicio" %}'; 
+        });
+    </script>
+
+</body>
+</html>

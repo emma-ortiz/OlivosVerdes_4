@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        /* CSS igual a inicios.html */
+        body {
+            background-color: #1b120d;
+            color: #fff;
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header {
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+        }
+
+        .contenedor {
+            width: 90%;
+            max-width: 400px;
+            margin: 30px auto;
+            background-color: #241913;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .contenedor h2 {
+            color: #ffce73;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+            .messages {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+
+        .mensaje {
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .mensaje.error {
+            background-color: #5c1010;
+            color: #ff6b6b;
+        }
+
+        .mensaje.success {
+            background-color: #355c1d;
+            color: #a7ff8c;
+        }
+
+        /* Ajustes para form.as_p */
+        .contenedor form p {
+            margin-bottom: 15px;
+        }
+
+        .contenedor form label {
+            color: #ffce73;
+            font-weight: bold;
+        }
+
+        .contenedor form input {
+            width: 90%;
+            padding: 10px;
+            margin: 0 auto;
+            display: block;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .continue-button {
+            display: block;
+            width: 100%;
+            background-color: #7fa650;
+            color: #fff;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .continue-button:hover {
+            background-color: #94c163;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #ddd;
+        }
+        .link a {
+            color: #ffce73;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+        
+    </style>
+</head>
+<body>
+    <header onclick="window.location.href='{% url "inicio" %}';">
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo" style="height: 30px; margin-right: 10px;">
+        OLIVOS VERDES
+    </header>
+
+    <main>
+       <div class="contenedor">
+
+                <h2>Iniciar Sesión</h2>
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li class="mensaje {{ message.tags }}">
+                        {{ message }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="mensaje error">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                                <p>
+                <label for="{{ form.username.id_for_label }}">Correo Electrónico:</label>
+                {{ form.username }}
+            </p>
+            <p>
+                <label for="{{ form.password.id_for_label }}">Contraseña:</label>
+                {{ form.password }}
+            </p>
+
+                    {% if request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% endif %}
+
+                    <button type="submit" class="continue-button">Iniciar Sesión</button>
+                </form>
+
+                <p class="link">
+                    ¿No tienes una cuenta? 
+                    <a href="{% url 'registro' %}">Regístrate aquí</a>
+                </p>
+
+            </div>
+
+    </main>
+
+    <footer>
+        Emma Monserrat Ortiz Martinez 0306 | Construye Aplicaciones Web
+    </footer>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Carrito | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        /* (Tu CSS existente va aquí - sin cambios) */
+        body {
+            background-color: #1b120d; color: #fff; font-family: 'Verdana', sans-serif;
+            margin: 0; padding: 0; min-height: 100vh; display: flex;
+            flex-direction: column; align-items: center;
+        }
+        header {
+            display: flex; align-items: center; justify-content: flex-start;
+            background-color: #1b120d; padding: 20px; color: #66842f;
+            font-size: 24px; font-weight: bold; width: 100%; box-sizing: border-box;
+        }
+        header img { height: 50px; margin-right: 10px; }
+        h1 { margin: 20px 0 10px; font-size: 28px; }
+        main { flex: 1; padding: 40px 20px; width: 90%; max-width: 900px; }
+        h2 { color: #ffce73; text-align: center; margin-bottom: 30px; font-size: 32px; }
+        .tabla-carrito {
+            width: 100%; border-collapse: collapse; margin-bottom: 20px;
+            background-color: #241913; border-radius: 10px;
+            overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .tabla-carrito th, .tabla-carrito td {
+            padding: 15px; text-align: left; border-bottom: 1px solid #333;
+        }
+        .tabla-carrito th {
+            background-color: #66842f; color: #fff; font-size: 16px;
+        }
+        .tabla-carrito td { color: #ddd; }
+        .item-info { display: flex; align-items: center; }
+        .item-info img {
+            width: 60px; height: 60px; object-fit: cover;
+            border-radius: 5px; margin-right: 15px;
+        }
+        .resumen-total {
+            text-align: right; padding: 20px; background-color: #241913;
+            border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .resumen-total p { font-size: 15px; font-weight: bold; margin: 5px 0; }
+        .resumen-total p.total {
+            color: #ffce73; font-size: 20px; border-top: 2px dashed #444;
+            padding-top: 10px; margin-top: 10px;
+        }
+        .btn-checkout {
+            background-color: #7fa650; color: #fff; padding: 15px 30px;
+            margin-top: 25px; border: none; border-radius: 25px;
+            font-weight: bold; font-size: 18px; cursor: pointer;
+            text-decoration: none; display: inline-block; transition: background-color 0.2s;
+        }
+        .btn-checkout:hover { background-color: #94c163; }
+        .carrito-vacio { text-align: center; padding: 50px; color: #ddd; }
+        .carrito-vacio a { color: #ffce73; text-decoration: none; font-weight: bold; }
+        .hamburger-icon { display: block; position: fixed; top: 15px; right: 15px; z-index: 1000; background: none; border: none; font-size: 30px; cursor: pointer; color: #66842f; }
+        .menu-nav { position: fixed; top: 0; right: 0; width: 250px; height: 100%; background-color: #66842f; z-index: 999; transform: translateX(100%); transition: transform 0.3s; }
+        .menu-nav.active { transform: translateX(0); }
+        .menu-nav ul { list-style: none; padding: 70px 0 0 0; margin: 0; }
+        .menu-nav li a { display: block; padding: 15px 20px; text-decoration: none; color: white; border-bottom: 1px solid #555; }
+        .menu-nav li a:hover { background-color: #555; }
+        footer { background-color: #1b120d; color: #aaa; padding: 15px; font-size: 13px; text-align: center; margin-top: auto; width: 100%;}
+        .btn-eliminar {
+            background-color: #ff4d4d; color: white; border: none;
+            padding: 5px 10px; border-radius: 5px; cursor: pointer;
+            font-size: 12px; transition: background-color 0.2s;
+        }
+        .btn-eliminar:hover { background-color: #e60000; }
+        .menu-nav li.has-submenu { position: relative; }
+        .menu-nav .submenu { display: none; list-style: none; padding: 0; margin: 0; background-color: #271b04ff; border-top: 1px solid #271b04ff; }
+        .menu-nav .submenu.show { display: block; }
+        .menu-nav .submenu li a { padding: 10px 20px 10px 30px; font-size: 14px; background-color: #271b04ff; }
+        .menu-nav .submenu li a:hover { text-decoration: underline; }
+        .menu-nav li.has-submenu > a { font-weight: bold; }
+        .menu-nav li.has-submenu > a:hover { background-color: #3a2706; color: white; }
+
+        /* ============================
+           NUEVOS ESTILOS PARA BOTONES +/-
+           ============================
+        */
+        .btn-ajustar {
+            text-decoration: none;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            background-color: #555; /* Color base */
+            border: none; /* Cambiado de <a> a <button> */
+            cursor: pointer;
+            font-size: 16px; /* Hacemos los botones un poco más grandes */
+            line-height: 1;
+        }
+        .btn-ajustar.disminuir { background-color: #ff4d4d; }
+        .btn-ajustar.aumentar { background-color: #7fa650; }
+        
+        .cantidad-item {
+            font-weight: bold; 
+            margin: 0 10px;
+            min-width: 20px; /* Damos espacio fijo */
+            text-align: center;
+        }
+        /* ============================ */
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo">
+        <span>Olivos Verdes</span>
+    </header>
+
+     <button class="hamburger-icon" id="menu-btn">☰</button>
+    
+   <nav class="menu-nav" id="menu">
+        <ul>
+            <li><a href="{% url 'ver_ofertas' %}">Ofertas</a></li>
+            <li class="has-submenu">
+                <a href="#">Categorías ▾</a>
+                <ul class="submenu">
+                    <li><a href="{% url 'menu_virtual' %}">Todo el Menú</a></li>
+                    <li><a href="{% url 'frutas_citricas' %}">Cítricas</a></li>
+                    <li><a href="{% url 'frutas_dulces' %}">Dulces</a></li>
+                    <li><a href="{% url 'frutas_neutras' %}">Neutras</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'ver_carrito' %}">Carrito</a></li>
+            
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'confirmar_compra' %}">Comprar</a></li>
+                <li><a href="{% url 'perfil' %}">Perfil ({{ user.username }})</a></li>
+                <li><a href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
+            {% else %}
+                <li><a href="{% url 'iniciar_sesion' %}">Iniciar Sesión</a></li>
+                <li><a href="{% url 'registro' %}">Registrarse</a></li>
+            {% endif %}
+            </ul>
+    </nav>
+
+
+    <main>
+        <h2>Cesta de Compras</h2>
+        
+        {% if carrito_items %}
+            <table class="tabla-carrito">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+    {% for item in carrito_items %}
+    <tr id="row-{{ item.producto.id }}"> 
+        <td>
+            <div class="item-info">
+                {% if item.producto.imagen %}
+                    <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}">
+                {% else %}
+                    <img src="{% static 'app_fruteria/imagenes/placeholder.jpg' %}" alt="{{ item.producto.nombre }}">
+                {% endif %}
+                {{ item.producto.nombre }}
+            </div>
+        </td>
+        
+        <td>${{ item.precio_unitario|floatformat:2 }}</td>
+        
+        <td>
+            <div style="display: flex; align-items: center; justify-content: space-around; width: 100px;">
+                <button class="btn-ajustar disminuir js-adjust-quantity" 
+                        data-product-id="{{ item.producto.id }}" 
+                        data-action="disminuir">
+                    -
+                </button>
+                
+                <span class="cantidad-item" id="quantity-{{ item.producto.id }}">
+                    {{ item.cantidad }}
+                </span>
+                
+                <button class="btn-ajustar aumentar js-adjust-quantity" 
+                        data-product-id="{{ item.producto.id }}" 
+                        data-action="aumentar">
+                    +
+                </button>
+            </div>
+            <span style="font-size: 12px; display: block; text-align: center;">kg</span>
+        </td>
+        
+        <td id="subtotal-item-{{ item.producto.id }}">
+            ${{ item.subtotal|floatformat:2 }}
+        </td>
+        <td>
+            <button class="btn-eliminar js-remove-item" data-product-id="{{ item.producto.id }}" data-row-id="row-{{ item.producto.id }}">
+                Eliminar
+            </button>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+            </table>
+            
+            <div class="resumen-total">
+                <p>Subtotal de productos: 
+                    <span id="subtotal-productos">${{ total_general|floatformat:2 }}</span>
+                </p>
+                <p>Costo de envío: 
+                    <span>${{ costo_envio|floatformat:2 }}</span>
+                </p>
+                
+                <p class="total">Total a pagar: 
+                    <span id="total-final">${{ total_final|floatformat:2 }}</span>
+                </p>
+
+                <a href="{% url 'confirmar_compra' %}" class="btn-checkout">
+                    Proceder a Comprar
+                </a>
+            </div>
+
+        {% else %}
+            <div class="carrito-vacio">
+                <p>Tu cesta está vacía. ¡Añade deliciosas frutas y verduras!</p>
+                <a href="{% url 'menu_virtual' %}">Explorar el Menú</a>
+            </div>
+        {% endif %}
+
+    </main>
+
+    <footer>
+        Emma Monserrat Ortiz Martinez 0306 | Construye Aplicaciones Web
+    </footer>
+
+    <script>
+        /* -------------------------
+        MENÚ HAMBURGUESA
+        ----------------------------*/
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
+        menuBtn.addEventListener('click', () => menu.classList.toggle('active'));
+
+        /* -------------------------
+        SUBMENÚ DE CATEGORÍAS
+        ----------------------------*/
+        const submenuToggle = document.querySelector('.has-submenu > a');
+        const submenu = document.querySelector('.has-submenu .submenu');
+        if (submenuToggle) { // Añadido chequeo por si no existe
+            submenuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                submenu.classList.toggle('show');
+            });
+        }
+
+        /* -------------------------
+        TOAST / NOTIFICACIONES
+        ----------------------------*/
+        function showToastMessage(message, type = 'success') {
+            const toast = document.createElement('div');
+            // ... (El código de showToastMessage se queda igual) ...
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed; top: 20px; right: 20px; padding: 15px 25px;
+                background-color: ${type === 'success' ? '#7fa650' : '#ff4d4d'};
+                color: white; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 9999; opacity: 0; transition: opacity 0.5s, transform 0.5s;
+                transform: translateY(-50px); font-family: sans-serif;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = 1;
+                toast.style.transform = 'translateY(0)';
+            }, 10);
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                toast.style.transform = 'translateY(-50px)';
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 1500); 
+        }
+
+        // Función reutilizable para actualizar todos los totales
+        function updateAllTotals(newSubtotal, newTotalFinal) {
+            const subtotalElement = document.getElementById('subtotal-productos');
+            const totalElement = document.getElementById('total-final');
+            
+            if (subtotalElement) {
+                subtotalElement.textContent = `$${parseFloat(newSubtotal).toFixed(2)}`;
+            }
+            if (totalElement) {
+                totalElement.textContent = `$${parseFloat(newTotalFinal).toFixed(2)}`;
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // -------------------------------------------------------------
+            // LÓGICA AJAX PARA ELIMINAR DEL CARRITO
+            // -------------------------------------------------------------
+            document.querySelectorAll('.js-remove-item').forEach(button => { // Cambiado de 'link' a 'button'
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); 
+
+                    const productId = this.dataset.productId;
+                    const rowId = this.dataset.rowId;
+                    const url = `/eliminar-carrito/${productId}/`;
+                    
+                    fetch(url, {
+                        method: 'GET', 
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(response => {
+                        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showToastMessage(data.message); 
+                            const rowToRemove = document.getElementById(rowId);
+                            if (rowToRemove) { rowToRemove.remove(); }
+                            
+                            // Usamos la función reutilizable
+                            updateAllTotals(data.new_subtotal, data.new_total_final);
+                            
+                            if (parseFloat(data.new_subtotal) <= 0) {
+                                setTimeout(() => window.location.reload(), 500); 
+                            }
+                        } else {
+                            showToastMessage(data.message || 'Error al eliminar.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToastMessage('Error de conexión con el servidor.', 'error');
+                    });
+                });
+            });
+
+            // -------------------------------------------------------------
+            // NUEVA LÓGICA AJAX PARA AJUSTAR CANTIDAD (+/-)
+            // -------------------------------------------------------------
+            document.querySelectorAll('.js-adjust-quantity').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const productId = this.dataset.productId;
+                    const action = this.dataset.action;
+                    const url = `/ajustar-cantidad/${productId}/${action}/`;
+                    
+                    fetch(url, {
+                        method: 'GET',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(response => {
+                        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // 1. Actualizar la cantidad del item
+                            const qtyElement = document.getElementById(`quantity-${productId}`);
+                            if (qtyElement) {
+                                qtyElement.textContent = data.new_quantity;
+                            }
+                            
+                            // 2. Actualizar el subtotal del item
+                            const itemSubtotalElement = document.getElementById(`subtotal-item-${productId}`);
+                            if (itemSubtotalElement) {
+                                itemSubtotalElement.textContent = `$${parseFloat(data.new_item_subtotal).toFixed(2)}`;
+                            }
+                            
+                            // 3. Actualizar totales globales
+                            updateAllTotals(data.new_subtotal, data.new_total_final);
+                            
+                        } else {
+                            // Si no fue 'success' (ej. "cantidad mínima 1")
+                            showToastMessage(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToastMessage('Error de conexión al ajustar.', 'error');
+                    });
+                });
+            });
+
+            // (El script para '.js-add-to-cart' se queda igual si lo tienes)
+
+        }); // Fin DOMContentLoaded
+    </script>
+
+</body>
+</html>

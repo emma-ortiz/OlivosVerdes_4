@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Virtual | Olivos Verdes</title>
+    {% load static %}
+    <style>
+        /* CSS se mantiene igual para conservar el diseño */
+        body {
+            background-color: #1b120d;
+            color: #fff;
+            font-family: 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #1b120d;
+            padding: 20px;
+            color: #66842f;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        /* === Barra Hamburguesa === */
+        .hamburger-icon {
+            display: block;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #66842f; /* Color verde del carrito */
+        }
+
+        .menu-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #66842f; /* Color verde del carrito */
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .menu-nav.active {
+            transform: translateX(0);
+        }
+
+        .menu-nav ul {
+            list-style: none;
+            padding: 70px 0 0 0;
+            margin: 0;
+        }
+
+        .menu-nav li a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            border-bottom: 1px solid #555;
+        }
+
+        .menu-nav li a:hover {
+            background-color: #555;
+        }
+
+        /* --- Contenido principal --- */
+        main {
+            flex: 1; 
+            padding: 20px 30px;
+        }
+
+        .intro {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .intro h2 {
+            color: #66842f;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .intro p {
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            color: #ddd;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .frutas {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+            .fruta {
+                background-color: #241913;
+                border-radius: 10px;
+                padding: 20px;
+                width: 230px;
+                text-align: center;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                transition: transform 0.2s ease-in-out;
+                display: flex;
+                flex-direction: column;
+                align-items: center;   /* Asegura que todo quede centrado */
+                box-sizing: border-box; /* Evita desbordes */
+            }
+
+        .fruta:hover {
+            transform: translateY(-5px);
+        }
+
+        
+        .fruta img {
+            width: 100%;          /* ahora ocupa todo el recuadro */
+            border-radius: 8px;
+            height: 170px;        /* AUMENTADO */
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .fruta h3 {
+            font-size: 18px;
+            margin: 10px 0 5px;
+            color: #66842f; 
+        }
+        
+        .fruta p.precio {
+            font-size: 16px;
+            color: #ffffff; 
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .btn-accion {
+            display: block;
+            width: 90%;               /* Ajuste perfecto, no toca bordes */
+            padding: 10px;
+            margin: 8px auto 0 auto;  /* Centrado total */
+            background-color: #66842f;
+            color: white;
+            text-align: center;
+            border-radius: 20px;      /* ← redondeado original restaurado */
+            text-decoration: none;
+            font-weight: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s ease-in-out;
+            box-sizing: border-box;
+        }
+
+
+        .btn-accion:hover {
+            background-color: #66842f;
+        }
+
+        .btn-accion + .btn-accion {
+            margin-top: 8px;         /* Espacio entre botones */
+        }
+
+        .btn-modal-add {
+            width: 90%;
+            margin: 10px auto 0 auto;
+            border-radius: 20px;
+        }
+
+
+        .btn-modal-add:hover {
+            background-color: #66842f;
+        }
+
+
+        /* --- Ventana Modal --- (Mantenemos los estilos de los modales aunque la implementación JS cambie) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background-color: #241913; padding: 25px; border-radius: 10px; width: 90%; max-width: 450px; text-align: center; color: #f5f5f5; box-shadow: 0 5px 15px rgba(0,0,0,0.7); position: relative; }
+        .modal-content img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+        .modal-content h3 { color: #66842f; font-size: 22px; margin-bottom: 10px; }
+        .modal-content p { font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #ddd; }
+        .close { position: absolute; top: 10px; right: 15px; color: #ff4d4d; font-weight: bold; cursor: pointer; font-size: 24px; }
+        .close:hover { color: #e60000; }
+        .btn-modal-add { margin-top: 15px; }
+
+        footer {
+            background-color: #1b120d;
+            color: #aaa;
+            padding: 15px;
+            font-size: 13px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        /* --- Nuevos Estilos para Submenús --- */
+            .menu-nav li.has-submenu {
+                position: relative;
+            }
+
+            /* Submenú oculto por defecto */
+            .menu-nav .submenu {
+                display: none;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                background-color: #271b04ff;
+                border-top: 1px solid #271b04ff;
+            }
+
+            /* Mostrar submenú solo cuando tiene la clase .show */
+            .menu-nav .submenu.show {
+                display: block;
+            }
+
+            /* Ítems del submenú */
+            .menu-nav .submenu li a {
+                padding: 10px 20px 10px 30px;
+                font-size: 14px;
+                background-color: #271b04ff;
+            }
+
+            .menu-nav .submenu li a:hover {
+                text-decoration: underline;
+            }
+
+            /* Estilo para el botón Categorías */
+            .menu-nav li.has-submenu > a {
+                font-weight: bold;
+            }
+
+            .menu-nav li.has-submenu > a:hover {
+                background-color: #3a2706;
+                color: white;
+            }
+
+    </style>
+</head>
+<body>
+    <header>
+        <img src="{% static 'app_fruteria/imagenes/icon.jpg' %}" alt="Logo">
+        Olivos Verdes
+    </header>
+    <button class="hamburger-icon" id="menu-btn">☰</button>
+    
+   <nav class="menu-nav" id="menu">
+        <ul>
+            <li><a href="{% url 'ver_ofertas' %}">Ofertas</a></li>
+            <li class="has-submenu">
+                <a href="#">Categorías ▾</a>
+                <ul class="submenu">
+                    <li><a href="{% url 'menu_virtual' %}">Todo el Menú</a></li>
+                    <li><a href="{% url 'frutas_citricas' %}">Cítricas</a></li>
+                    <li><a href="{% url 'frutas_dulces' %}">Dulces</a></li>
+                    <li><a href="{% url 'frutas_neutras' %}">Neutras</a></li>
+                </ul>
+            </li>
+            <li><a href="{% url 'ver_carrito' %}">Carrito</a></li>
+            
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'confirmar_compra' %}">Comprar</a></li>
+                <li><a href="{% url 'perfil' %}" style="background-color: #4a6121; font-weight: bold;">Perfil ({{ user.username }})</a></li>
+                <li><a href="{% url 'cerrar_sesion' %}">Cerrar Sesión</a></li>
+
+            {% else %}
+                <li><a href="{% url 'iniciar_sesion' %}">Iniciar Sesión</a></li>
+                <li><a href="{% url 'registro' %}">Registrarse</a></li>
+            {% endif %}
+            </ul>
+    </nav>
+
+    <main>
+        <section class="intro">
+            <h2>Conoce nuestro catálogo de {{ nombre_seccion|default:"Frutas Cítricas" }} </h2>
+            <p>Las frutas cítricas son aquellas que pertenecen al género Citrus y se caracterizan por su sabor ácido debido al alto contenido de ácido cítrico, además de ser una excelente fuente de vitamina C.</p>
+        </section>
+
+        <section class="frutas">
+            {% for producto in lista_productos %}
+                <div class="fruta">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                    {% else %}
+                        <img src="{% static 'app_fruteria/imagenes/placeholder.jpg' %}" alt="{{ producto.nombre }}">
+                    {% endif %}
+                    
+                    <h3>{{ producto.nombre }}</h3>
+                    {% if producto.precio_final < producto.precio %}
+                        <p class="precio-original" style="text-decoration: line-through; color: #888; font-size: 0.9em;">
+                            ${{ producto.precio|floatformat:2 }} / kg
+                        </p>
+                        <p class="precio-oferta" style="color: #FF4500; font-weight: bold; font-size: 1.1em;">
+                            ¡OFERTA! ${{ producto.precio_final|floatformat:2 }} / kg
+                        </p>
+                        {% else %}
+                            <p class="precio">${{ producto.precio|floatformat:2 }} / kg</p>
+                    {% endif %}
+                    
+                    <button class="btn-accion btn-modal-add js-add-to-cart" 
+                            data-product-id="{{ producto.id }}" 
+                            data-product-name="{{ producto.nombre }}"
+                            onclick="cerrarModal('modal-{{ producto.id }}');">
+                        Añadir al Carrito 
+                    </button>
+                    <button class="btn-accion" onclick="mostrarModal('modal-{{ producto.id }}')">Ver más</button>
+                </div>
+            {% empty %}
+                <p style="text-align: center; width: 100%;">Aún no hay productos en el catálogo. Por favor, añádelos en el administrador.</p>
+            {% endfor %}
+        </section>
+
+        {% for producto in lista_productos %}
+            <div id="modal-{{ producto.id }}" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="cerrarModal('modal-{{ producto.id }}')">&times;</span>
+                    
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                    {% else %}
+                        <img src="{% static 'app_fruteria/imagenes/placeholder.jpg' %}" alt="{{ producto.nombre }}">
+                    {% endif %}
+                    
+                    <h3>{{ producto.nombre }}</h3>
+                    
+                    <p style="text-align:left;">
+                        <strong>Nombre:</strong> <span>{{ producto.nombre }}</span><br>
+                        <strong>Categoría:</strong> <span>{{ producto.categoria.nombre|default:"No especificado" }}</span><br>
+                        <strong>Precio:</strong> <span>${{ producto.precio|floatformat:2 }} / kg</span><br>
+                        <strong>Descripción:</strong> <span>{{ producto.descripcion|default:"Sin descripción detallada." }}</span>
+                    </p>
+                    
+                    <button class="btn-accion js-add-to-cart" 
+                            data-product-id="{{ producto.id }}" 
+                            data-product-name="{{ producto.nombre }}">
+                        Añadir al Carrito 
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+
+    </main>
+
+    <footer>
+        Emma Monserrat Ortiz Martinez 0306 | Construye Aplicaciones Web
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
+        menuBtn.addEventListener('click', () => menu.classList.toggle('active'));
+ 
+        // -------------------------------------------------------------
+        // JS para Submenú Clic (MUESTRA SOLO AL DAR CLIC)
+        // -------------------------------------------------------------
+        
+       const submenuToggle = document.querySelector('.has-submenu > a');
+       const submenu = document.querySelector('.has-submenu .submenu');
+
+        submenuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            submenu.classList.toggle('show');
+     });
+
+        // Funciones de modales (Ya existentes)
+        function mostrarModal(id) {
+            document.getElementById(id).style.display = "flex";
+        }
+
+        function cerrarModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+        function showToastMessage(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+    
+            // Estilos básicos para la notificación
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background-color: #7fa650; /* Color de éxito */
+                color: white;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 9999;
+                opacity: 0;
+                transition: opacity 0.2s, transform 0.2s;
+                transform: translateY(-50px);
+            `;
+    
+            document.body.appendChild(toast);
+            
+            // Mostrar y luego ocultar
+            setTimeout(() => {
+                toast.style.opacity = 1;
+                toast.style.transform = 'translateY(0)';
+            }, 10);
+
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                toast.style.transform = 'translateY(-50px)';
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 1500); // Mostrar por 3 segundos
+        }
+
+        document.querySelectorAll('.js-add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.dataset.productId;
+                const url = `/agregar-carrito/${productId}/`; // Asegúrate de que esta URL coincida con tu urls.py
+                
+                // Usar Fetch API para enviar la solicitud de forma asíncrona
+                fetch(url, {
+                    method: 'GET', // Usamos GET ya que el botón no es un formulario, aunque POST sería más RESTful
+                    headers: {
+                        // Indicamos al servidor que es una solicitud AJAX
+                        'X-Requested-With': 'XMLHttpRequest', 
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Muestra la notificación suave
+                        showToastMessage(data.message);
+                        
+                        // Opcional: Actualizar un contador de carrito en el header sin recargar
+                        // document.getElementById('cart-count').textContent = data.cart_count;
+                    } else {
+                        showToastMessage('Error al añadir el producto.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToastMessage('Error de conexión con el servidor.', 'error');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
